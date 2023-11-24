@@ -1,0 +1,22 @@
+{% extends "index.html" %}
+
+{% block recommendations %}
+<h3 class="title" style="margin-left:18px;">Top Recommendations</h3>
+{% for movie in rc: %}
+  <div class="card">
+    <div class="front" style="background-image: url({{movie.img_url}});">
+        <p class="large">{{movie.ranking}}</p>
+    </div>
+    <div class="back">
+      <div>
+        <div class="title">{{movie.title}} <span class="release_date">({{movie.year}})</span></div>
+          <p class="overview">
+            {{movie.description}}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+<h3 class="title" style="margin-left:18px;">My favourites</h3>
+{% endblock %}

@@ -1,0 +1,3 @@
+[submodule "Advanced-blog-website"]
+	path = Advanced-blog-website
+	url = git@github.com:MSVelan/Advanced-blog-website.git

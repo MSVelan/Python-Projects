@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>News blog MSV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+<body>
+<div class="wrapper">
+    <div class="top">
+        <div class="title"><h1>My Blog</h1></div>
+    </div>
+    <div class="content">
+        {% for blog in blogs: %}
+            <div class="card">
+                <h2>{{ blog["title"] }}</h2>
+                <p class="text">{{ blog["subtitle"] }}</p>
+                <a href="{{ url_for('blogPage',blogId=blog['id']) }}">Read</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+</body>
+<footer>
+    <p>Made with ♥️ by MSV.</p>
+</footer>
+</html>
