@@ -5,10 +5,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import ElementClickInterceptedException
 import time
 import pickle
+import os
+from dotenv import load_dotenv
 
-SIMILAR_ACCOUNT = "iiitiansnetwork"
-USERNAME = "mrgeek217"
-PASSWORD = "qwertyMSV"
+load_dotenv()
+
+SIMILAR_ACCOUNT = os.getenv("SIMILAR_ACCOUNT")
+USERNAME = os.getenv("USERNAME")
+PASSWORD = os.getenv("PASSWORD")
 
 class InstaFollower:
     driver = webdriver.Chrome()
