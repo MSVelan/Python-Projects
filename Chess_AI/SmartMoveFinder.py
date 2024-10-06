@@ -1,9 +1,11 @@
 import random
+from concurrent.futures import ThreadPoolExecutor
+
 
 pieceScores = {"K": 0, "Q": 9, "R": 5, "B": 3, "N": 3, "p": 1}
 CHECKMATE = 1000
 STALEMATE = 0
-DEPTH = 3
+DEPTH = 5
 
 knightScores = [
     [1, 1, 1, 1, 1, 1, 1, 1],
@@ -13,8 +15,8 @@ knightScores = [
     [1, 2, 3, 4, 4, 3, 2, 1],
     [1, 2, 3, 3, 3, 3, 2, 1],
     [1, 2, 2, 2, 2, 2, 2, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1]
-                ]
+    [1, 1, 1, 1, 1, 1, 1, 1],
+]
 
 bishopScores = [
     [4, 3, 2, 1, 1, 2, 3, 4],
@@ -24,7 +26,7 @@ bishopScores = [
     [1, 2, 3, 4, 4, 3, 2, 1],
     [2, 3, 4, 3, 3, 4, 3, 2],
     [3, 4, 3, 2, 2, 3, 4, 3],
-    [4, 3, 2, 1, 1, 2, 3, 4]
+    [4, 3, 2, 1, 1, 2, 3, 4],
 ]
 
 queenScores = [
@@ -57,7 +59,7 @@ whitePawnScores = [
     [1, 2, 3, 4, 4, 3, 2, 1],
     [1, 1, 2, 3, 3, 2, 1, 1],
     [1, 1, 1, 0, 0, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
 blackPawnScores = [
@@ -71,19 +73,28 @@ blackPawnScores = [
     [9, 9, 9, 9, 9, 9, 9, 9],
 ]
 
-piecePositionScores = {"N": knightScores, "Q": queenScores, "B": bishopScores, "R": rookScores, "bp": blackPawnScores,
-                       "wp": whitePawnScores}
+piecePositionScores = {
+    "N": knightScores,
+    "Q": queenScores,
+    "B": bishopScores,
+    "R": rookScores,
+    "bp": blackPawnScores,
+    "wp": whitePawnScores,
+}
 
-'''
+"""
 Picks and returns a random move.
-'''
+"""
+
 
 def findRandomMove(validMoves):
-    return validMoves[random.randint(0, len(validMoves)-1)]
+    return validMoves[random.randint(0, len(validMoves) - 1)]
 
-'''
+
+"""
 Find the best move, min max without recursion.
-'''
+"""
+
 
 def findBestMoveSimpleGreedy(gs, validMoves):
     turnMultiplier = 1 if gs.whiteToMove else -1
@@ -116,15 +127,20 @@ def findBestMoveSimpleGreedy(gs, validMoves):
         gs.undoMove()
     return bestPlayerMove
 
-'''
+
+"""
 Helper method to make first recursive call
-'''
+"""
+
+
 def findBestMove(gs, validMoves, returnQueue):
     global nextMove
     nextMove = None
     # findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
     # findMoveNegaMax(gs, validMoves, DEPTH, 1 if gs.whiteToMove else -1)
-    findMoveNegaMaxAlphaBeta(gs, validMoves, DEPTH, -CHECKMATE, CHECKMATE, 1 if gs.whiteToMove else -1)
+    findMoveNegaMaxAlphaBeta(
+        gs, validMoves, DEPTH, -CHECKMATE, CHECKMATE, 1 if gs.whiteToMove else -1
+    )
     returnQueue.put(nextMove)
 
 
@@ -137,7 +153,7 @@ def findMoveMinMax(gs, validMoves, depth, whiteToMove):
         for move in validMoves:
             gs.makeMove(move)
             nextMoves = gs.getValidMoves()
-            score = findMoveMinMax(gs, nextMoves, depth-1, False)
+            score = findMoveMinMax(gs, nextMoves, depth - 1, False)
             if score > maxScore:
                 maxScore = score
                 if depth == DEPTH:
@@ -150,7 +166,7 @@ def findMoveMinMax(gs, validMoves, depth, whiteToMove):
         for move in validMoves:
             gs.makeMove(move)
             nextMoves = gs.getValidMoves()
-            score = findMoveMinMax(gs, nextMoves, depth-1, True)
+            score = findMoveMinMax(gs, nextMoves, depth - 1, True)
             if score < minScore:
                 minScore = score
                 if depth == DEPTH:
@@ -187,7 +203,9 @@ def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier)
     for move in validMoves:
         gs.makeMove(move)
         nextMoves = gs.getValidMoves()
-        score = -findMoveNegaMaxAlphaBeta(gs, nextMoves, depth - 1, -beta, -alpha, -turnMultiplier)
+        score = -findMoveNegaMaxAlphaBeta(
+            gs, nextMoves, depth - 1, -beta, -alpha, -turnMultiplier
+        )
         if score > maxScore:
             maxScore = score
             if depth == DEPTH:
@@ -200,9 +218,11 @@ def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier)
     return maxScore
 
 
-'''
+"""
 A positive score from this is good for white
-'''
+"""
+
+
 def scoreBoard(gs):
     if gs.checkmate:
         if gs.whiteToMove:
@@ -223,25 +243,26 @@ def scoreBoard(gs):
                         piecePositionScore = piecePositionScores[square][row][col]
                     else:
                         piecePositionScore = piecePositionScores[square[1]][row][col]
-                if square[0] == 'w':
+                if square[0] == "w":
                     score += pieceScores[square[1]] + piecePositionScore * 0.2
-                elif square[0] == 'b':
+                elif square[0] == "b":
                     score -= pieceScores[square[1]] + piecePositionScore * 0.2
 
     return score
 
 
-'''
+"""
 Score the board based on material.
-'''
+"""
+
 
 def scoreMaterial(board):
     score = 0
     for row in board:
         for square in row:
-            if square[0] == 'w':
+            if square[0] == "w":
                 score += pieceScores[square[1]]
-            elif square[0] == 'b':
+            elif square[0] == "b":
                 score -= pieceScores[square[1]]
 
     return score
