@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 pieceScores = {"K": 0, "Q": 9, "R": 5, "B": 3, "N": 3, "p": 1}
 CHECKMATE = 1000
 STALEMATE = 0
-DEPTH = 5
+DEPTH = 3
 
 knightScores = [
     [1, 1, 1, 1, 1, 1, 1, 1],
